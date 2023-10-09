@@ -6,7 +6,6 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/carbon.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
 import 'package:iconify_flutter/icons/radix_icons.dart';
-import 'package:iconify_flutter/icons/majesticons.dart';
 import 'package:majesticons_flutter/majesticons_flutter.dart';
 
 
