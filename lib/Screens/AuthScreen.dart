@@ -2,15 +2,8 @@ import 'package:bcall/Components/LoginContainer.dart';
 import 'package:bcall/Components/SignUpContainer.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
-import 'package:email_validator/email_validator.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/clarity.dart';
-import 'package:iconify_flutter/icons/octicon.dart';
-import 'package:iconify_flutter/icons/radix_icons.dart';
-import 'package:majesticons_flutter/majesticons_flutter.dart';
+
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -70,13 +63,13 @@ class _AuthScreenState extends State<AuthScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Need an account?",
+                        isLogin ? "Need an account?" : "Already have an account?",
                         style: subheader,
                       ),
                       GestureDetector(
                         onTap: toggleSignUp,
                         child: Text(
-                          'Create an account',
+                          isLogin ? 'Create an account' : 'Login',
                           style: subheader2,
                         ),
                       )
