@@ -1,17 +1,23 @@
+import 'package:bcall/Models/AuthModels.dart';
+import 'package:bcall/Providers/AuthProvider.dart';
+import 'package:bcall/Screens/HomeScreen.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
 import 'package:majesticons_flutter/majesticons_flutter.dart';
 
-class LoginContainer extends StatefulWidget{
+class LoginContainer extends ConsumerStatefulWidget{
+  //const LoginContainer({super.key});
+
   @override
   _LoginContainerState createState() => _LoginContainerState();
 }
 
-class _LoginContainerState extends State<LoginContainer>{
+class _LoginContainerState extends ConsumerState<LoginContainer>{
   bool showEyedIcon = true;
 
   //this icon function
@@ -41,6 +47,7 @@ class _LoginContainerState extends State<LoginContainer>{
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context){
@@ -99,6 +106,7 @@ class _LoginContainerState extends State<LoginContainer>{
             ),
             SizedBox(height: 10),
             TextFormField(
+              controller: passwordController,
               obscureText: showEyedIcon,
               decoration: InputDecoration(
                 prefixIcon:  Padding(
@@ -147,9 +155,20 @@ class _LoginContainerState extends State<LoginContainer>{
               height: 60,
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: isButtonDisabled ? null : (){
+                onPressed: isButtonDisabled ? null : () async {
                   if (_formKey.currentState != null && _formKey.currentState!.validate() && !isButtonDisabled) {
-
+                    final loginResult = await ref.watch(authProvider).login(emailController.text, passwordController.text);
+                    
+                    if(loginResult.token == null){
+                      print(loginResult.statusCode);
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(),
+                        )
+                      );
+                    }
                   } else {
                     setState(() {
                       isButtonDisabled = true;
