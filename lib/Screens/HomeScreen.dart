@@ -1,7 +1,14 @@
+import 'package:bcall/Components/Drawer%20Components/CustomDrawer.dart';
 import 'package:bcall/Components/Drawer%20Components/LeftPageDrawer.dart';
 import 'package:bcall/Components/Drawer%20Components/MainPageDrawer.dart';
 import 'package:bcall/Components/PlaceholderContainer.dart';
+import 'package:bcall/Screens/VideoCallScreen.dart';
+import 'package:bcall/Style/colors_style.dart';
+import 'package:bcall/Style/text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:iconify_flutter/icons/ph.dart';
+import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/fluent_emoji_high_contrast.dart';
 import 'package:overlapping_panels/overlapping_panels.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,17 +32,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        OverlappingPanels(
-          left: Builder(
-            builder: (context) => const LeftPage(),
+    return Scaffold(
+      backgroundColor: secondary2,
+      appBar: AppBar(
+        backgroundColor: secondary2,
+        title: Text('A Awaluddin', style: title,),
+        actions: [
+          IconButton(
+            icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VideoCall(),
+                  )
+              );
+            },
           ),
-          main: Builder(
-            builder: (context) => const MainPage(),
-          )
-        )
-      ],
+        ],
+      ),
+      drawer: CustomDrawer(),
+
     );
+    // return Stack(
+    //   children: [
+    //     OverlappingPanels(
+    //       left: Builder(
+    //         builder: (context) => const LeftPage(),
+    //       ),
+    //       main: Builder(
+    //         builder: (context) => const MainPage(),
+    //       )
+    //     )
+    //   ],
+    // );
+
+    
   }
 }
