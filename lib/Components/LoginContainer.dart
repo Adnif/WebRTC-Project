@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:bcall/Models/AuthModels.dart';
 import 'package:bcall/Providers/AuthProvider.dart';
 import 'package:bcall/Screens/HomeScreen.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
+import 'package:bcall/services/SignallingService.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,9 +51,16 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
     }
   }
 
+  final String websocketUrl = "http://10.0.2.2:5001/";
+  final String selfCallerID = Random().nextInt(999999).toString().padLeft(6, '0');
+
 
   @override
   Widget build(BuildContext context){
+    SignallingService.instance.init(
+      websocketUrl: websocketUrl,
+      selfCallerID: selfCallerID
+    );
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Form(
@@ -165,7 +175,7 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
+                          builder: (context) => HomeScreen(selfCallerID: selfCallerID,),
                         )
                       );
                     }

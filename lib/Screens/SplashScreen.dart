@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bcall/Screens/AuthScreen.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
+import 'package:bcall/services/SignallingService.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -29,9 +31,10 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: primary,
       body: Stack(

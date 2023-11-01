@@ -15,9 +15,18 @@ app.use(cors());
 //Route Registry
 app.use("/api/auth", authRoutes);
 
-
 //Create the server
 const server = http.createServer(app);
+
+const callController = require("./controllers/callController");
+
+//Create the Socket.IO server
+const IO = callController(server);
+
+//Start the Socket.IO server
+// IO.listen(() => {
+//   console.log("Socket.IO server started");
+// });
 
 
 mongoose
