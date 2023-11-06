@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bcall/services/SignallingService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -33,7 +35,7 @@ class _CallScreenState extends State<CallScreen> {
   RTCPeerConnection? _rtcPeerConnection;
 
   // list of rtcCandidates to be sent over signalling
-  List<RTCIceCandidate> rtcIceCadidates = [];
+  List<RTCIceCandidate> rtcIceCandidates = [];
 
   // media status
   bool isAudioOn = true, isVideoOn = true, isFrontCameraSelected = true;
@@ -42,13 +44,24 @@ class _CallScreenState extends State<CallScreen> {
   void initState() {
 
     
-    // initializing renderers
-    _localRTCVideoRenderer.initialize();
-    _remoteRTCVideoRenderer.initialize();
-
+    initLocalRenderer();
+    initRemoteRenderer();
     // setup Peer Connection
     _setupPeerConnection();
     super.initState();
+    
+  }
+
+  void initLocalRenderer() async{
+    // initializing renderers
+    await _localRTCVideoRenderer.initialize();
+    //await _remoteRTCVideoRenderer.initialize();
+  }
+
+  void initRemoteRenderer() async{
+    // initializing renderers
+    //await _localRTCVideoRenderer.initialize();
+    await _remoteRTCVideoRenderer.initialize();
   }
 
   @override
@@ -63,16 +76,32 @@ class _CallScreenState extends State<CallScreen> {
     _rtcPeerConnection = await createPeerConnection({
       'iceServers': [
         {
-          'urls': [
-            'stun:stun1.l.google.com:19302',
-            'stun:stun2.l.google.com:19302'
-          ]
-        }
+          'urls': "turn:a.relay.metered.ca:80",
+          'username' : "9a56d5ca1061c8827acace13",
+          'credential' : "gZqt/KtqoDB3P+ne",
+        },
+        {
+          'urls': "turn:a.relay.metered.ca:80?transport=tcp",
+          'username': "9a56d5ca1061c8827acace13",
+          'credential': "gZqt/KtqoDB3P+ne",
+        },
+        {
+          'urls': "turn:a.relay.metered.ca:443",
+          'username': "9a56d5ca1061c8827acace13",
+          'credential': "gZqt/KtqoDB3P+ne",
+        },
+        {
+          'urls': "turn:a.relay.metered.ca:443?transport=tcp",
+          'username': "9a56d5ca1061c8827acace13",
+          'credential': "gZqt/KtqoDB3P+ne",
+        },
+
       ]
     });
 
     // listen for remotePeer mediaTrack event
     _rtcPeerConnection!.onTrack = (event) {
+      log('Mau liat event: ${event.streams[0]}');
       _remoteRTCVideoRenderer.srcObject = event.streams[0];
       setState(() {});
     };
@@ -94,6 +123,8 @@ class _CallScreenState extends State<CallScreen> {
     _localRTCVideoRenderer.srcObject = _localStream;
     setState(() {});
 
+    log('ICE Connection State: ${_rtcPeerConnection?.iceConnectionState}');
+
     // for Incoming call
     if (widget.offer != null) {
       // listen for Remote IceCandidate
@@ -108,7 +139,9 @@ class _CallScreenState extends State<CallScreen> {
           sdpMid,
           sdpMLineIndex,
         ));
+        log('Received candidate: $candidate');
       });
+      
 
       // set SDP offer as remoteDescription for peerConnection
       await _rtcPeerConnection!.setRemoteDescription(
@@ -131,7 +164,7 @@ class _CallScreenState extends State<CallScreen> {
     else {
       // listen for local iceCandidate and add it to the list of IceCandidate
       _rtcPeerConnection!.onIceCandidate =
-          (RTCIceCandidate candidate) => rtcIceCadidates.add(candidate);
+          (RTCIceCandidate candidate) => rtcIceCandidates.add(candidate);
 
       // when call is accepted by remote peer
       socket!.on("callAnswered", (data) async {
@@ -142,9 +175,10 @@ class _CallScreenState extends State<CallScreen> {
             data["sdpAnswer"]["type"],
           ),
         );
+        log('Received answer: ${data["sdpAnswer"]}');
 
         // send iceCandidate generated to remote peer over signalling
-        for (RTCIceCandidate candidate in rtcIceCadidates) {
+        for (RTCIceCandidate candidate in rtcIceCandidates) {
           socket!.emit("IceCandidate", {
             "calleeId": widget.calleeId,
             "iceCandidate": {
@@ -153,6 +187,7 @@ class _CallScreenState extends State<CallScreen> {
               "candidate": candidate.candidate
             }
           });
+          log('Sent candidate: ${candidate.candidate}'); 
         }
       });
 
@@ -161,7 +196,7 @@ class _CallScreenState extends State<CallScreen> {
 
       // set SDP offer as localDescription for peerConnection
       await _rtcPeerConnection!.setLocalDescription(offer);
-
+      
       // make a call to remote peer over signalling
       socket!.emit('makeCall', {
         "calleeId": widget.calleeId,
@@ -209,6 +244,7 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log('Ini Connection State: ${_rtcPeerConnection?.connectionState}');
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
@@ -276,6 +312,7 @@ class _CallScreenState extends State<CallScreen> {
     _remoteRTCVideoRenderer.dispose();
     _localStream?.dispose();
     _rtcPeerConnection?.dispose();
+    log('ICE Connection State: ${_rtcPeerConnection?.iceConnectionState}');
     super.dispose();
   }
 }
