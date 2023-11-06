@@ -51,156 +51,159 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
     }
   }
 
-  final String websocketUrl = "http://10.0.2.2:5001/";
-  final String selfCallerID = Random().nextInt(999999).toString().padLeft(6, '0');
+  //final String websocketUrl = "http://10.0.2.2:5001/";
+  final String websocketUrl = "http://localhost:5001/";
+  final String selfCallerId = Random().nextInt(999999).toString().padLeft(6, '0');
 
 
   @override
   Widget build(BuildContext context){
     SignallingService.instance.init(
       websocketUrl: websocketUrl,
-      selfCallerID: selfCallerID
+      selfCallerID: selfCallerId
     );
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Form(
         key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 10,),
-            Text(
-              'Welcome Back',
-              style: headline,
-            ),
-            SizedBox(height: 10,),
-            Text(
-              'Fill you identity to login',
-              style: subheader,
-            ),
-            SizedBox(height: 30,),
-            TextFormField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Majesticon(Majesticon.mailLine, color: Colors.black,),
-                ),
-                labelText: 'Email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5))
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1)
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                filled: true,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10,),
+              Text(
+                'Welcome Back',
+                style: headline,
               ),
-              validator: (email){
-                 return EmailValidator.validate(email!) ? null : 'Masukan Email dengan benar!';
-              },
-              onChanged: (val){
-                if(val.isNotEmpty){
-                    setState(() {
-                      isEmailFilled = true;
-                  });
-                } else {
-                  setState(() {
-                    isEmailFilled = false;
-                  });
-                }
-                checkEmailPass();
-              },
-
-            ),
-            SizedBox(height: 10),
-            TextFormField(
-              controller: passwordController,
-              obscureText: showEyedIcon,
-              decoration: InputDecoration(
-                prefixIcon:  Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Majesticon(Majesticon.lockLine, color: Colors.black,),
-                ),
-                suffixIcon: GestureDetector(
-                  onTap: toggleIcon,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: showEyedIcon ? const Iconify(Octicon.eye_closed_24) : const Iconify(Octicon.eye_24),
+              SizedBox(height: 10,),
+              Text(
+                'Fill you identity to login',
+                style: subheader,
+              ),
+              SizedBox(height: 30,),
+              TextFormField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Majesticon(Majesticon.mailLine, color: Colors.black,),
                   ),
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 1)
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
+                  filled: true,
                 ),
-                labelText: 'Password',
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5))
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1)
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                filled: true,
-              ),
-              validator: (pass){
-                if (pass != null && (pass.length >= 6 && pass.length <= 12)) {
-                  return null; // Password is valid
-                } else {
-                  return 'Password must be between 6 and 12 characters';
-                }
-              },
-              onChanged: (val){
-                if(val.isNotEmpty){
-                    setState(() {
-                      isPasswordFilled = true;
-                  });
-                } else {
-                  setState(() {
-                    isPasswordFilled = false;
-                  });
-                }
-                checkEmailPass();
-              },
-            ),
-            SizedBox(height: 35,),
-            Container(
-              height: 60,
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isButtonDisabled ? null : () async {
-                  if (_formKey.currentState != null && _formKey.currentState!.validate() && !isButtonDisabled) {
-                    final loginResult = await ref.watch(authProvider).login(emailController.text, passwordController.text);
-                    
-                    if(loginResult.token == null){
-                      print(loginResult.statusCode);
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(selfCallerID: selfCallerID,),
-                        )
-                      );
-                    }
+                validator: (email){
+                   return EmailValidator.validate(email!) ? null : 'Masukan Email dengan benar!';
+                },
+                onChanged: (val){
+                  if(val.isNotEmpty){
+                      setState(() {
+                        isEmailFilled = true;
+                    });
                   } else {
                     setState(() {
-                      isButtonDisabled = true;
+                      isEmailFilled = false;
                     });
                   }
+                  checkEmailPass();
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:  primary,
-                  disabledBackgroundColor: bodyc,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)
-                  )
-                  //padding: EdgeInsets.only(left: 1, right: 1)
-                ),
-                child: Text(
-                  'Login',
-                  style: subheader2,
-                )
+        
               ),
-            ),
-            const SizedBox(height: 10),
-          ],
+              SizedBox(height: 10),
+              TextFormField(
+                controller: passwordController,
+                obscureText: showEyedIcon,
+                decoration: InputDecoration(
+                  prefixIcon:  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Majesticon(Majesticon.lockLine, color: Colors.black,),
+                  ),
+                  suffixIcon: GestureDetector(
+                    onTap: toggleIcon,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: showEyedIcon ? const Iconify(Octicon.eye_closed_24) : const Iconify(Octicon.eye_24),
+                    ),
+                  ),
+                  labelText: 'Password',
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black, width: 1)
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
+                  filled: true,
+                ),
+                validator: (pass){
+                  if (pass != null && (pass.length >= 6 && pass.length <= 12)) {
+                    return null; // Password is valid
+                  } else {
+                    return 'Password must be between 6 and 12 characters';
+                  }
+                },
+                onChanged: (val){
+                  if(val.isNotEmpty){
+                      setState(() {
+                        isPasswordFilled = true;
+                    });
+                  } else {
+                    setState(() {
+                      isPasswordFilled = false;
+                    });
+                  }
+                  checkEmailPass();
+                },
+              ),
+              SizedBox(height: 35,),
+              Container(
+                height: 60,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isButtonDisabled ? null : () async {
+                    if (_formKey.currentState != null && _formKey.currentState!.validate() && !isButtonDisabled) {
+                      final loginResult = await ref.watch(authProvider).login(emailController.text, passwordController.text);
+                      
+                      if(loginResult.token == null){
+                        print(loginResult.statusCode);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomeScreen(selfCallerId: selfCallerId,),
+                          )
+                        );
+                      }
+                    } else {
+                      setState(() {
+                        isButtonDisabled = true;
+                      });
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:  primary,
+                    disabledBackgroundColor: bodyc,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)
+                    )
+                    //padding: EdgeInsets.only(left: 1, right: 1)
+                  ),
+                  child: Text(
+                    'Login',
+                    style: subheader2,
+                  )
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
         ),
       ),
     );

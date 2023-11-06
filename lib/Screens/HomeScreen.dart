@@ -1,4 +1,5 @@
-import 'dart:math';
+
+import 'dart:developer';
 
 import 'package:bcall/Components/Drawer%20Components/CustomDrawer.dart';
 import 'package:bcall/Components/Drawer%20Components/LeftPageDrawer.dart';
@@ -15,9 +16,9 @@ import 'package:iconify_flutter/icons/fluent_emoji_high_contrast.dart';
 import 'package:overlapping_panels/overlapping_panels.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String selfCallerID;
+  final String selfCallerId;
 
-  const HomeScreen({super.key, required this.selfCallerID});
+  const HomeScreen({super.key, required this.selfCallerId});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -26,6 +27,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   dynamic incomingSDPOffer;
   int _currentIndex = 0;
+  TextEditingController remoteCallerIdController = TextEditingController();
 
   final List<Widget> _children = [
     PlaceholderWidget('Friends'),
@@ -44,8 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    log("My caller ID: ${widget.selfCallerId}");
     SignallingService.instance.socket!.on("newCall", (data) {
+      log(incomingSDPOffer.toString());
       if (mounted) {
         // set SDP Offer of incoming call
         setState(() => incomingSDPOffer = data);
@@ -72,23 +75,80 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
-
     return Scaffold(
       backgroundColor: secondary2,
       appBar: AppBar(
         backgroundColor: secondary2,
-        title: Text('A Awaluddin', style: title,),
+        title: Text('A Awaluddin ${widget.selfCallerId}', style: title,),
         actions: [
           IconButton(
             icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
             onPressed: () {
               _joinCall(
-                callerId: widget.selfCallerID,
+                callerId: widget.selfCallerId,
                 calleeId: '232322323',
               );
             },
           ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              children: [
+                TextField(
+                  controller: remoteCallerIdController,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "Remote Caller ID",
+                    alignLabelWithHint: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0)
+                    )
+                  ),
+                ),
+                const SizedBox(height: 12,),
+                ElevatedButton(
+                  child: const Text("Invite"),
+                  onPressed: (){
+                    _joinCall(callerId: widget.selfCallerId, calleeId: remoteCallerIdController.text);
+                  },
+                )
+              ],
+            ),
+          ),
+          incomingSDPOffer != null 
+          ? Positioned(
+              child: Column(
+                  children: [
+                    Text("Incoming Call from ${incomingSDPOffer["callerId"]}"),
+                    IconButton(
+                      icon: const Icon(Icons.call_end),
+                      color: Colors.redAccent,
+                      onPressed: (){
+                        setState(() {
+                          incomingSDPOffer = null;
+                        });
+                      },
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.call),
+                        color: Colors.greenAccent,
+                        onPressed: () {
+                          _joinCall(
+                            callerId: incomingSDPOffer["callerId"]!,
+                            calleeId: widget.selfCallerId,
+                            offer: incomingSDPOffer["sdpOffer"],
+                          );
+                        },
+                      )
+                  ],
+                ),
+              )
+            
+          : Container()
+          
         ],
       ),
       drawer: CustomDrawer(),
