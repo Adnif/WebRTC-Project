@@ -76,6 +76,11 @@ class _CallScreenState extends State<CallScreen> {
     _rtcPeerConnection = await createPeerConnection({
       'iceServers': [
         {
+          'urls':[
+            'stun:stun.l.google.com:19302'
+          ]
+        },
+        {
           'urls': "turn:a.relay.metered.ca:80",
           'username' : "9a56d5ca1061c8827acace13",
           'credential' : "gZqt/KtqoDB3P+ne",

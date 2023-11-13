@@ -1,7 +1,14 @@
+import 'dart:developer';
+
+import 'package:bcall/Providers/AuthProvider.dart';
+import 'package:bcall/Screens/AuthScreen.dart';
+import 'package:bcall/Screens/HomeScreen.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/carbon.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
@@ -9,12 +16,12 @@ import 'package:iconify_flutter/icons/radix_icons.dart';
 import 'package:majesticons_flutter/majesticons_flutter.dart';
 
 
-class SignUpContainer extends StatefulWidget{
+class SignUpContainer extends ConsumerStatefulWidget{
   @override
   _SignUpContainerState createState() => _SignUpContainerState();
 }
 
-class _SignUpContainerState extends State<SignUpContainer>{
+class _SignUpContainerState extends ConsumerState<SignUpContainer>{
   bool showEyedIcon = true;
 
   void toggleIcon(){
@@ -86,6 +93,7 @@ class _SignUpContainerState extends State<SignUpContainer>{
                 ),
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 filled: true,
+                fillColor: Colors.white
               ),
               validator: (email){
                  return EmailValidator.validate(email!) ? null : 'Masukan Email dengan benar!';
@@ -121,6 +129,7 @@ class _SignUpContainerState extends State<SignUpContainer>{
                 ),
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 filled: true,
+                fillColor: Colors.white
               ),
               validator: (username){
                  return (username!.length > 3 && username.length < 12) ? null : 'Masukan Email dengan benar!';
@@ -141,6 +150,7 @@ class _SignUpContainerState extends State<SignUpContainer>{
             ),
             SizedBox(height: 10),
             TextFormField(
+              controller: passwordController,
               obscureText: showEyedIcon,
               decoration: InputDecoration(
                 prefixIcon:  Padding(
@@ -163,6 +173,7 @@ class _SignUpContainerState extends State<SignUpContainer>{
                 ),
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 filled: true,
+                fillColor: Colors.white
               ),
               validator: (pass){
                 if (pass != null && (pass.length >= 6 && pass.length <= 12)) {
@@ -202,6 +213,7 @@ class _SignUpContainerState extends State<SignUpContainer>{
                 ),
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 filled: true,
+                fillColor: Colors.white
               ),
               onChanged: (val){
                 if(val.isNotEmpty){
@@ -222,9 +234,21 @@ class _SignUpContainerState extends State<SignUpContainer>{
               height: 60,
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: isButtonDisabled ? null : (){
+                onPressed: isButtonDisabled ? null : () async {
                   if (_formKey.currentState != null && _formKey.currentState!.validate() && !isButtonDisabled) {
-        
+                    final signupResult = await ref.watch(authProvider).signup(usernameController.text, emailController.text, passwordController.text, phoneController.text);
+
+                    if(signupResult == '201'){
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AuthScreen(),
+                          )
+                        );
+                    } else {
+                      log('$signupResult');
+                      Fluttertoast.showToast(msg: signupResult!);
+                    }
                   } else {
                     setState(() {
                       isButtonDisabled = true;
@@ -240,7 +264,7 @@ class _SignUpContainerState extends State<SignUpContainer>{
                   //padding: EdgeInsets.only(left: 1, right: 1)
                 ),
                 child: Text(
-                  'Login',
+                  'Sign Up',
                   style: subheader2,
                 )
               ),
