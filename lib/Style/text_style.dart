@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bcall/Style/colors_style.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -23,6 +24,13 @@ final subheader = GoogleFonts.poppins(
   color: Colors.white
 );
 
+final subheaderBody = GoogleFonts.poppins(
+  fontSize: 12,
+  fontWeight: FontWeight.w400,
+  letterSpacing: 0.02,
+  color: bodyc
+);
+
 final subheader2 = GoogleFonts.poppins(
   fontSize: 12,
   fontWeight: FontWeight.w600,
@@ -35,6 +43,13 @@ final body = GoogleFonts.poppins(
   fontWeight: FontWeight.w400,
   //letterSpacing: 0.02,
   color: Colors.white
+);
+
+final bodyGray = GoogleFonts.poppins(
+  fontSize: 12,
+  fontWeight: FontWeight.w400,
+  //letterSpacing: 0.02,
+  color: bodyc
 );
 
 final button = GoogleFonts.poppins(

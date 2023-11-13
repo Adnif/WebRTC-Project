@@ -19,58 +19,63 @@ import 'package:iconify_flutter/icons/fluent_emoji_high_contrast.dart';
 import 'package:overlapping_panels/overlapping_panels.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatefulWidget {
-
-  const HomeScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  final String name;
+  final String callId;
+  final List<dynamic> friendList;
+  const ChatScreen({super.key, required this.friendList, required this.name, required this.callId});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _ChatScreenState extends State<ChatScreen> {
   final String websocketUrl = "http://10.0.2.2:5001/";
   //final String websocketUrl = "http://localhost:5001/";
   //final String selfCallerId = math.Random().nextInt(999999).toString().padLeft(6, '0');
   
   dynamic incomingSDPOffer;
-  TextEditingController remoteCallerIdController = TextEditingController();
+  TextEditingController chatController = TextEditingController();
 
-  final List<Widget> _children = [
-    PlaceholderWidget('Friends'),
-    PlaceholderWidget('Video')
-  ];
-
-  String username = 'DNS';
+  
   String id = 'DNS';
-  List<dynamic> friends = [];
   String selfCallerId = '000000';
 
-  Future<void> _getUser() async {
-    log('Masuk ke log getUser()');
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('token') ?? '';
 
-    final response = await UserProvider().getUser(token);
+  List<Map<String, dynamic>> chatStream = [];
 
-    Map<String, dynamic> responseBody = json.decode(response.body);
-    setState((){
-      log(responseBody.toString());
-      username = responseBody['username'];
-      id = responseBody['_id'];
-      friends = responseBody['friends'];
-      selfCallerId = id.substring(id.length - 6);
-      log('Hasil Response $id $username $friends');
-    });
-  }
-
+  final socket = SignallingService.instance.socket;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    log("My caller ID: ${selfCallerId}");
-    _getUser();
+    socket!.on('chat', (data) {
+      if(mounted && data['sender'] == widget.callId){
+        setState(() {
+          chatStream.add(data);
+        });
+      }
+      
+    });
     
+    //log("My caller ID: ${selfCallerId}");
+  }
+
+ void sendMessage(message) {
+    if (message.isNotEmpty) {
+      // Emit the 'chat' event to the server
+      socket!.emit('chat', {
+        'calleeId': widget.callId,
+        'msg': message,
+      });
+
+      // Update the local UI with the sent message
+      setState(() {
+        chatStream.add({'sender' : 'You', 'msg': message});
+        chatController.clear();
+      });
+    }
   }
 
   _joinCall({
@@ -92,24 +97,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SignallingService.instance.init(
-      websocketUrl: websocketUrl,
-      selfCallerID: selfCallerId
-    );
-
-    SignallingService.instance.socket!.on("newCall", (data) {
-      log(incomingSDPOffer.toString());
-      if (mounted) {
-        // set SDP Offer of incoming call
-        setState(() => incomingSDPOffer = data);
-      }
-    });
-
     return Scaffold(
       backgroundColor: secondary2,
       appBar: AppBar(
         backgroundColor: secondary2,
-        title: Text('${username} ${selfCallerId}', style: title,),
+        title: Text('${widget.name} ${widget.callId}', style: title,),
         actions: [
           IconButton(
             icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
@@ -124,29 +116,54 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          Center(
-            child: Column(
-              children: [
-                TextField(
-                  controller: remoteCallerIdController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    hintText: "Remote Caller ID",
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0)
-                    )
-                  ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: chatStream.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    Map<String, dynamic> chatData = chatStream[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: chatData['sender'] == 'You' ? Colors.blueGrey : Colors.amber,
+                        radius: 20,
+                      ),
+                      subtitle: Text(chatData['msg'], style: subheaderBody,),
+                      title: chatData['sender'] == 'You' ? Text('You', style: subheaderBody,) : Text('${widget.name}', style: subheaderBody,),
+                    );
+                  }
                 ),
-                const SizedBox(height: 12,),
-                ElevatedButton(
-                  child: const Text("Invite"),
-                  onPressed: (){
-                    _joinCall(callerId: selfCallerId, calleeId: remoteCallerIdController.text);
-                  },
-                )
-              ],
-            ),
+              ),
+              Row(
+                children: [
+                  const SizedBox(width: 20,),
+                  Expanded(
+                    child: Container(
+                      color: Colors.white,
+                      height: 40,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: TextFormField(
+                          controller: chatController,
+                          decoration: InputDecoration.collapsed(
+                            hintText: "Send a message",
+                            hintStyle: subheaderBody,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send,color: bodyc,),
+                    onPressed: (){
+                      sendMessage(chatController.text);
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 5,)
+            ],
           ),
           incomingSDPOffer != null 
           ? Positioned(
@@ -181,22 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
           
         ],
       ),
-      drawer: CustomDrawer(friendList: friends,),
+      drawer: CustomDrawer(friendList: widget.friendList,),
 
     );
-    // return Stack(
-    //   children: [
-    //     OverlappingPanels(
-    //       left: Builder(
-    //         builder: (context) => const LeftPage(),
-    //       ),
-    //       main: Builder(
-    //         builder: (context) => const MainPage(),
-    //       )
-    //     )
-    //   ],
-    // );
-
-    
   }
 }

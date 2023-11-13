@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bcall/Models/AuthModels.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -11,8 +13,8 @@ class AuthService {
   //Login Controller
   Future<LoginResults> login(String email, String password) async {
     final response = await http.post(
-      //Uri.parse('http://10.0.2.2:5001/api/auth/login'), // Replace with your server URL
-      Uri.parse('http://localhost:5001/api/auth/login'), // Replace with your server URL
+      Uri.parse('http://10.0.2.2:5001/api/auth/login'), // Replace with your server URL
+      //Uri.parse('http://localhost:5001/api/auth/login'), // Replace with your server URL
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -34,24 +36,30 @@ class AuthService {
   }
 
   //Sign Up Controller
-  Future<String> signup(String email, String password) async {
+  Future<String?> signup(String username, String email, String password, String phoneNum) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:5001/api/auth/signup'), // Replace with your server's signup URL
+      Uri.parse('http://10.0.2.2:5001/api/auth/register'), // Replace with your server's signup URL
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
+        'username': username,
         'mail': email,
         'password': password,
+        'phonenum': phoneNum
       }),
     );
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = json.decode(response.body);
-      return data['userDetails']['token'];
-    } else {
-      throw Exception('Failed to signup');
-    }
+    log(response.statusCode);
+    return response.statusCode.toString();
+    // if (response.statusCode == 200) {
+    //   Map<String, dynamic> data = json.decode(response.body);
+    //   return data['userDetails']['token'];
+    // } else {
+    //   log(response.statusCode);
+    //   return response.body.toString();
+    //   //throw Exception('Failed to signup');
+    // }
   }
 }
 

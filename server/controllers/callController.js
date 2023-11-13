@@ -44,6 +44,16 @@ const callController = (server) => {
           iceCandidate: iceCandidate,
         });
       });
+
+      socket.on("chat", (data) => {
+        let calleeId = data.calleeId;
+        let msg = data.msg;
+  
+        socket.to(calleeId).emit("chat", {
+          sender: socket.user,
+          msg: msg,
+        });
+      });
     });
   
     return IO;

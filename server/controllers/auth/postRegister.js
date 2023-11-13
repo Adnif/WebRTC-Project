@@ -24,7 +24,7 @@ const postRegister = async (req, res) => {
       username,
       mail: mail.toLowerCase(),
       password: encryptedPassword,
-      phonenum
+      phonenum,
     });
 
     // create JWT token

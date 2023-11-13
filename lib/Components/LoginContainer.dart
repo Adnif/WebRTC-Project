@@ -1,5 +1,5 @@
-import 'dart:math';
-
+import 'dart:developer';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bcall/Models/AuthModels.dart';
 import 'package:bcall/Providers/AuthProvider.dart';
 import 'package:bcall/Screens/HomeScreen.dart';
@@ -51,17 +51,15 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
     }
   }
 
-  //final String websocketUrl = "http://10.0.2.2:5001/";
-  final String websocketUrl = "http://localhost:5001/";
-  final String selfCallerId = Random().nextInt(999999).toString().padLeft(6, '0');
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context){
-    SignallingService.instance.init(
-      websocketUrl: websocketUrl,
-      selfCallerID: selfCallerId
-    );
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Form(
@@ -98,6 +96,7 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
                   ),
                   floatingLabelBehavior: FloatingLabelBehavior.never,
                   filled: true,
+                  fillColor: Colors.white
                 ),
                 validator: (email){
                    return EmailValidator.validate(email!) ? null : 'Masukan Email dengan benar!';
@@ -141,6 +140,7 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
                   ),
                   floatingLabelBehavior: FloatingLabelBehavior.never,
                   filled: true,
+                  fillColor: Colors.white
                 ),
                 validator: (pass){
                   if (pass != null && (pass.length >= 6 && pass.length <= 12)) {
@@ -174,10 +174,13 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
                       if(loginResult.token == null){
                         print(loginResult.statusCode);
                       } else {
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        prefs.setString('token', loginResult.token!);
+                        log('log yang disimpan: ${loginResult.token!}');
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HomeScreen(selfCallerId: selfCallerId,),
+                            builder: (context) => HomeScreen(),
                           )
                         );
                       }
