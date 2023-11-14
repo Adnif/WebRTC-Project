@@ -8,6 +8,7 @@ import 'package:bcall/Components/Drawer%20Components/LeftPageDrawer.dart';
 import 'package:bcall/Components/Drawer%20Components/MainPageDrawer.dart';
 import 'package:bcall/Components/PlaceholderContainer.dart';
 import 'package:bcall/Providers/UserProvider.dart';
+import 'package:bcall/Screens/ChatScreen.dart';
 import 'package:bcall/Screens/VideoCallScreen.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
@@ -29,21 +30,28 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final String websocketUrl = "http://10.0.2.2:5001/";
-  //final String websocketUrl = "http://localhost:5001/";
-  //final String selfCallerId = math.Random().nextInt(999999).toString().padLeft(6, '0');
+  //final String websocketUrl = "http://localhost:5001/";;
   
   dynamic incomingSDPOffer;
   TextEditingController remoteCallerIdController = TextEditingController();
 
-  final List<Widget> _children = [
-    PlaceholderWidget('Friends'),
-    PlaceholderWidget('Video')
-  ];
+  int _selectedIndex = 0;
 
   String username = 'DNS';
   String id = 'DNS';
   List<dynamic> friends = [];
   String selfCallerId = '000000';
+
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void refreshState() {
+    setState(() {});
+  }
 
   Future<void> _getUser() async {
     log('Masuk ke log getUser()');
@@ -63,14 +71,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     log("My caller ID: ${selfCallerId}");
     _getUser();
-    
   }
 
   _joinCall({
@@ -90,6 +96,59 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  _incomingCall(){
+    log('incoming SDP Offer: ${incomingSDPOffer}');
+    Future.delayed(Duration.zero, (){
+        if(incomingSDPOffer != null){
+          return showModalBottomSheet(
+            isScrollControlled: true,
+            backgroundColor: secondary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0)
+            ),
+            context: context,
+            builder: (BuildContext context){
+              return Container(
+                height: 300,
+                child: Column(
+                  children: [
+                    Text("Incoming Call from ${incomingSDPOffer["callerId"]}"),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.call_end),
+                          color: Colors.redAccent,
+                          onPressed: (){
+                            setState(() {
+                              incomingSDPOffer = null;
+                            });
+                          },
+                        ),
+                        IconButton(
+                            icon: const Icon(Icons.call),
+                            color: Colors.greenAccent,
+                            onPressed: () {
+                              _joinCall(
+                                callerId: incomingSDPOffer["callerId"]!,
+                                calleeId: selfCallerId,
+                                offer: incomingSDPOffer["sdpOffer"],
+                              );
+                            },
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              );
+            }
+          );
+        } else {
+          return Container();
+        }
+    });
+    return Container();
+  }
+
   @override
   Widget build(BuildContext context) {
     SignallingService.instance.init(
@@ -104,99 +163,39 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => incomingSDPOffer = data);
       }
     });
-
-    return Scaffold(
-      backgroundColor: secondary2,
-      appBar: AppBar(
-        backgroundColor: secondary2,
-        title: Text('${username} ${selfCallerId}', style: title,),
-        actions: [
-          IconButton(
-            icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
-            onPressed: () {
-              _joinCall(
-                callerId: selfCallerId,
-                calleeId: '232322323',
-              );
-            },
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Center(
-            child: Column(
-              children: [
-                TextField(
-                  controller: remoteCallerIdController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    hintText: "Remote Caller ID",
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0)
-                    )
-                  ),
-                ),
-                const SizedBox(height: 12,),
-                ElevatedButton(
-                  child: const Text("Invite"),
-                  onPressed: (){
-                    _joinCall(callerId: selfCallerId, calleeId: remoteCallerIdController.text);
-                  },
-                )
-              ],
-            ),
-          ),
-          incomingSDPOffer != null 
-          ? Positioned(
-              child: Column(
-                  children: [
-                    Text("Incoming Call from ${incomingSDPOffer["callerId"]}"),
-                    IconButton(
-                      icon: const Icon(Icons.call_end),
-                      color: Colors.redAccent,
-                      onPressed: (){
-                        setState(() {
-                          incomingSDPOffer = null;
-                        });
-                      },
-                    ),
-                    IconButton(
-                        icon: const Icon(Icons.call),
-                        color: Colors.greenAccent,
-                        onPressed: () {
-                          _joinCall(
-                            callerId: incomingSDPOffer["callerId"]!,
-                            calleeId: selfCallerId,
-                            offer: incomingSDPOffer["sdpOffer"],
-                          );
-                        },
-                      )
-                  ],
-                ),
-              )
-            
-          : Container()
-          
-        ],
-      ),
-      drawer: CustomDrawer(friendList: friends,),
-
-    );
-    // return Stack(
-    //   children: [
-    //     OverlappingPanels(
-    //       left: Builder(
-    //         builder: (context) => const LeftPage(),
-    //       ),
-    //       main: Builder(
-    //         builder: (context) => const MainPage(),
-    //       )
-    //     )
-    //   ],
-    // );
-
     
+
+    return Builder(
+      builder: (context) {
+        return Scaffold(
+          backgroundColor: secondary2,
+          appBar: AppBar(
+            backgroundColor: secondary2,
+            title: friends.isEmpty ? Text('Loading...'): Text('${friends[_selectedIndex]['username']} ${friends[_selectedIndex]['_id'].substring(friends[_selectedIndex]['_id'].length - 6)}', style: title,),
+            actions: [
+              IconButton(
+                icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
+                onPressed: () {
+                  _joinCall(
+                    callerId: selfCallerId,
+                    calleeId: friends[_selectedIndex]['_id'].substring(friends[_selectedIndex]['_id'].length - 6),
+                  );
+                },
+              ),
+            ],
+          ),
+          body: friends.isNotEmpty 
+                ? Stack(
+                    children: [
+                      ChatScreen(name: friends[_selectedIndex]['username'], callId: friends[_selectedIndex]['_id'].substring(friends[_selectedIndex]['_id'].length - 6), key: UniqueKey(),),
+                    _incomingCall()!
+                    ]
+                  ) 
+                : Placeholder(),
+          drawer: CustomDrawer(friendList: friends, callback: _onItemTapped, refresh: refreshState,),
+
+        );
+      }
+    );
   }
 }

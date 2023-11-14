@@ -45,8 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
               style: bold,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 715.0, left: 143),
+          Center(
             child: Column(
               children: [
                 Text(

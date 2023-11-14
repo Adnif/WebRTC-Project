@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ffi';
 import 'package:bcall/Screens/ChatScreen.dart';
 import 'package:bcall/Providers/UserProvider.dart';
+import 'package:bcall/Screens/HomeScreen.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomDrawer extends StatefulWidget {
   List<dynamic> friendList;
-  CustomDrawer({super.key, required, required this.friendList});
+  Function(int) callback;
+  Function() refresh;
+  CustomDrawer({super.key, required, required this.friendList, required this.callback, required this.refresh});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -38,9 +40,13 @@ class _CustomDrawerState extends State<CustomDrawer>{
         msg: "Teman berhasil ditambah",
         toastLength: Toast.LENGTH_SHORT
       );
-      setState(() {
-        
-      });
+      widget.refresh();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        )
+      );
     } else if(response.statusCode == 404){
       Fluttertoast.showToast(
         msg: responseBody["message"]
@@ -57,7 +63,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
       width: 350, // Set the desired width here
       child: Row(
           children: [
-            SizedBox(
+            SizedBox(   
               width: 70,
               child: ListView(
                 children: [
@@ -218,8 +224,12 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                   ),
                                 ),
                                 //...["Bambang Kuncoro", "A. Awalludin", "Buyung Ahmad Yani"]
-                                ...widget.friendList
-                                    .map((channel) => ListTile(
+                                ...widget.friendList.asMap()
+                                  .entries.map((entry) { 
+                                    final int index = entry.key;
+                                    final Map<String, dynamic> channel = entry.value;
+
+                                    return ListTile(
                                           leading: const CircleAvatar(
                                             backgroundColor: Colors.amber,
                                             radius: 20,
@@ -227,14 +237,11 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                           horizontalTitleGap: 7,
                                           title: Text(channel['username'], style: subheader,),
                                           onTap: () {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ChatScreen(friendList: widget.friendList, name: channel['username'], callId: channel['_id'].substring(channel['_id'].length - 6),),
-                                              )
-                                            );
+                                            widget.callback(index);
+                                            Navigator.pop(context);
                                           },
-                                        )),                                
+                                    );                            
+                                  }),                                
                               ],
                             ),
                           ),
