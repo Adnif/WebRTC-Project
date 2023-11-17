@@ -263,7 +263,7 @@ class _CallScreenState extends State<CallScreen> {
   Widget build(BuildContext context) {
     log('Ini Connection State: ${_rtcPeerConnection?.connectionState}');
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: white,
       appBar: AppBar(
         title: const Text("P2P Call App"),
         backgroundColor: secondary2,

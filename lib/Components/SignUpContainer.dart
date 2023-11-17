@@ -68,12 +68,12 @@ class _SignUpContainerState extends ConsumerState<SignUpContainer>{
             SizedBox(height: 10,),
             Text(
               'Create Account',
-              style: headline,
+              style: headlineBlack,
             ),
             SizedBox(height: 10,),
             Text(
               'Create your account to access this apps',
-              style: subheader,
+              style: subheaderBlack,
             ),
             SizedBox(height: 30,),
             TextFormField(
@@ -256,7 +256,7 @@ class _SignUpContainerState extends ConsumerState<SignUpContainer>{
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:  primary,
+                  backgroundColor:  green,
                   disabledBackgroundColor: bodyc,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)
@@ -265,7 +265,7 @@ class _SignUpContainerState extends ConsumerState<SignUpContainer>{
                 ),
                 child: Text(
                   'Sign Up',
-                  style: subheader2,
+                  style: subheader2Black,
                 )
               ),
             ),
