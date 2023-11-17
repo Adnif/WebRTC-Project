@@ -31,6 +31,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final String websocketUrl = "http://10.0.2.2:5001/";
   //final String websocketUrl = "http://localhost:5001/";
+  //final String websocketUrl = "http://192.168.17.160:5001/";
   //final String selfCallerId = math.Random().nextInt(999999).toString().padLeft(6, '0');
   
   dynamic incomingSDPOffer;
@@ -97,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: secondary2,
+      backgroundColor: Colors.white,
       // appBar: AppBar(
       //   backgroundColor: secondary2,
       //   title: Text('${widget.name} ${widget.callId}', style: title,),

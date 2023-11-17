@@ -71,12 +71,12 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
               SizedBox(height: 10,),
               Text(
                 'Welcome Back',
-                style: headline,
+                style: headlineBlack,
               ),
               SizedBox(height: 10,),
               Text(
                 'Fill you identity to login',
-                style: subheader,
+                style: subheaderBlack,
               ),
               SizedBox(height: 30,),
               TextFormField(
@@ -191,7 +191,7 @@ class _LoginContainerState extends ConsumerState<LoginContainer>{
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:  primary,
+                    backgroundColor:  green,
                     disabledBackgroundColor: bodyc,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)

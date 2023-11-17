@@ -14,6 +14,7 @@ class AuthService {
   Future<LoginResults> login(String email, String password) async {
     final response = await http.post(
       Uri.parse('http://10.0.2.2:5001/api/auth/login'), // Replace with your server URL
+      //Uri.parse('http://192.168.17.160:5001/api/auth/login'), // Replace with your server URL
       //Uri.parse('http://localhost:5001/api/auth/login'), // Replace with your server URL
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

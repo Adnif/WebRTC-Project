@@ -59,7 +59,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
   Widget build(BuildContext context) {
     //log(friendList.toString());
     return Container(
-      color: secondary,
+      color: white,
       width: 350, // Set the desired width here
       child: Row(
           children: [
@@ -72,7 +72,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                       horizontal: 8, vertical: 4
                     ),
                     child: CircleAvatar(
-                      backgroundColor: Colors.white,
+                      backgroundColor: primary,
                       radius: 30,
                     ),
                   ),
@@ -94,7 +94,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
               child: SafeArea(
                 child: Container(
                     decoration: BoxDecoration(
-                        color: secondary2,
+                        color: lightBlue,
                         borderRadius: BorderRadius.circular(16)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +116,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                     onPressed: (){
                                       showModalBottomSheet(
                                         isScrollControlled: true,
-                                        backgroundColor: secondary,
+                                        backgroundColor: lightGrey,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(20.0)
                                         ),
@@ -134,7 +134,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                                     Center(
                                                       child: Text(
                                                         'Invite a Friend',
-                                                        style: headline,
+                                                        style: headlineBlack,
                                                       ),
                                                     ),
                                                     const SizedBox(height: 10,),
@@ -171,7 +171,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                                           addFriend(phoneNumController.text);                                
                                                         },
                                                         style: ElevatedButton.styleFrom(
-                                                          backgroundColor:  primary,
+                                                          backgroundColor:  green,
                                                           disabledBackgroundColor: bodyc,
                                                           shape: RoundedRectangleBorder(
                                                             borderRadius: BorderRadius.circular(10.0)
@@ -207,7 +207,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                         ),
                         Expanded(
                           child: Material(
-                            color: secondary2,
+                            color: lightBlue,
                             child: ListView(
                               children: [
                                 Padding(
@@ -219,7 +219,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                   child: Center(
                                     child: Text(
                                       'Private Messages',
-                                      style: subheader,
+                                      style: subheaderBlack,
                                     ),
                                   ),
                                 ),
@@ -235,7 +235,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                             radius: 20,
                                           ),
                                           horizontalTitleGap: 7,
-                                          title: Text(channel['username'], style: subheader,),
+                                          title: Text(channel['username'], style: subheaderBlack,),
                                           onTap: () {
                                             widget.callback(index);
                                             Navigator.pop(context);

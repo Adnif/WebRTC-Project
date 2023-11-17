@@ -29,8 +29,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //final String websocketUrl = "http://192.168.17.160:5001/";
+  //final String websocketUrl = "http://localhost:5001/";
   final String websocketUrl = "http://10.0.2.2:5001/";
-  //final String websocketUrl = "http://localhost:5001/";;
   
   dynamic incomingSDPOffer;
   TextEditingController remoteCallerIdController = TextEditingController();
@@ -77,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     log("My caller ID: ${selfCallerId}");
     _getUser();
+    //_incomingCall();
   }
 
   _joinCall({
@@ -96,58 +98,65 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  _incomingCall(){
-    log('incoming SDP Offer: ${incomingSDPOffer}');
-    Future.delayed(Duration.zero, (){
-        if(incomingSDPOffer != null){
-          return showModalBottomSheet(
-            isScrollControlled: true,
-            backgroundColor: secondary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0)
-            ),
-            context: context,
-            builder: (BuildContext context){
-              return Container(
-                height: 300,
-                child: Column(
-                  children: [
-                    Text("Incoming Call from ${incomingSDPOffer["callerId"]}"),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.call_end),
-                          color: Colors.redAccent,
-                          onPressed: (){
-                            setState(() {
-                              incomingSDPOffer = null;
-                            });
-                          },
-                        ),
-                        IconButton(
-                            icon: const Icon(Icons.call),
-                            color: Colors.greenAccent,
-                            onPressed: () {
-                              _joinCall(
-                                callerId: incomingSDPOffer["callerId"]!,
-                                calleeId: selfCallerId,
-                                offer: incomingSDPOffer["sdpOffer"],
-                              );
-                            },
-                        )
-                      ],
-                    )
-                  ],
+
+  Widget _incomingCall() {
+  log('incoming SDP Offer: ${incomingSDPOffer}');
+  if (incomingSDPOffer != null) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: secondary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            height: 300,
+            child: Column(
+              children: [
+                Text(
+                  "Incoming Call from ${incomingSDPOffer["callerId"]}",
+                  style: headline,
                 ),
-              );
-            }
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.call_end),
+                      color: Colors.redAccent,
+                      onPressed: () {
+                        setState(() {
+                          incomingSDPOffer = null;
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.call),
+                      color: Colors.greenAccent,
+                      onPressed: () {
+                        _joinCall(
+                          callerId: incomingSDPOffer["callerId"]!,
+                          calleeId: selfCallerId,
+                          offer: incomingSDPOffer["sdpOffer"],
+                        );
+                        // Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
           );
-        } else {
-          return Container();
-        }
+        },
+      );
     });
-    return Container();
   }
+
+  // Return an empty container if there is no incoming call
+  return Container();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -168,13 +177,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Builder(
       builder: (context) {
         return Scaffold(
-          backgroundColor: secondary2,
+          backgroundColor: black,
           appBar: AppBar(
-            backgroundColor: secondary2,
-            title: friends.isEmpty ? Text('Loading...'): Text('${friends[_selectedIndex]['username']} ${friends[_selectedIndex]['_id'].substring(friends[_selectedIndex]['_id'].length - 6)}', style: title,),
+            backgroundColor: lightGrey,
+            iconTheme: IconThemeData(color: black),
+            title: friends.isEmpty ? Text('Loading...'): Text('${friends[_selectedIndex]['username']} ${friends[_selectedIndex]['_id'].substring(friends[_selectedIndex]['_id'].length - 6)}', style: titleBlack,),
             actions: [
               IconButton(
-                icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
+                icon: const Iconify(Ph.video_camera_fill, color: black,), // widget,
                 onPressed: () {
                   _joinCall(
                     callerId: selfCallerId,
@@ -188,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Stack(
                     children: [
                       ChatScreen(name: friends[_selectedIndex]['username'], callId: friends[_selectedIndex]['_id'].substring(friends[_selectedIndex]['_id'].length - 6), key: UniqueKey(),),
-                    _incomingCall()!
+                      if (incomingSDPOffer != null) _incomingCall(),
                     ]
                   ) 
                 : Placeholder(),

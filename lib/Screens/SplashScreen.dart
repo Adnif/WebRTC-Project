@@ -36,25 +36,28 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primary,
-      body: Stack(
+      backgroundColor: Colors.white,
+      body: Column(
         children: [
+          SizedBox(height: 300,),
           Center(
             child: Text(
               'LOGO',
-              style: bold,
+              style: boldGreen,
             ),
           ),
+          SizedBox(height: 300,),
           Center(
             child: Column(
+              
               children: [
                 Text(
                   'FROM',
-                  style: medium,
+                  style: mediumBlack,
                 ),
                 Text(
                   'BP JAMSOSTEK',
-                  style: medium,
+                  style: mediumBlack,
                 )
               ],
             ),
