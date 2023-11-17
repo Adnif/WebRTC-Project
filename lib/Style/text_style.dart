@@ -10,6 +10,13 @@ final headline = GoogleFonts.poppins(
   color: Colors.white
 );
 
+final headlineBlack = GoogleFonts.poppins(
+  fontSize: 22,
+  fontWeight: FontWeight.bold,
+  //letterSpacing: 0.02,
+  color: black
+);
+
 final title = GoogleFonts.poppins(
   fontSize: 16,
   fontWeight: FontWeight.w500,
@@ -17,11 +24,25 @@ final title = GoogleFonts.poppins(
   color: Colors.white
 );
 
+final titleBlack = GoogleFonts.poppins(
+  fontSize: 16,
+  fontWeight: FontWeight.w500,
+  //letterSpacing: 0.02,
+  color: black
+);
+
 final subheader = GoogleFonts.poppins(
   fontSize: 12,
   fontWeight: FontWeight.w400,
   letterSpacing: 0.02,
   color: Colors.white
+);
+
+final subheaderBlack = GoogleFonts.poppins(
+  fontSize: 12,
+  fontWeight: FontWeight.w400,
+  letterSpacing: 0.02,
+  color: black
 );
 
 final subheaderBody = GoogleFonts.poppins(
@@ -36,6 +57,13 @@ final subheader2 = GoogleFonts.poppins(
   fontWeight: FontWeight.w600,
   //letterSpacing: 0.02,
   color: Colors.white
+);
+
+final subheader2Black = GoogleFonts.poppins(
+  fontSize: 12,
+  fontWeight: FontWeight.w600,
+  //letterSpacing: 0.02,
+  color: black
 );
 
 final body = GoogleFonts.poppins(
@@ -81,6 +109,13 @@ final bold = GoogleFonts.poppins(
   color: Colors.white
 );
 
+final boldGreen = GoogleFonts.poppins(
+  fontSize: 56,
+  fontWeight: FontWeight.bold,
+  letterSpacing: -0.44,
+  color: green
+);
+
 final medium = GoogleFonts.poppins(
   fontSize: 16,
   fontWeight: FontWeight.normal,
@@ -88,6 +123,11 @@ final medium = GoogleFonts.poppins(
   color: Colors.white
 );
 
-
+final mediumBlack = GoogleFonts.poppins(
+  fontSize: 16,
+  fontWeight: FontWeight.normal,
+  letterSpacing: 0.02,
+  color: black
+);
 
 

@@ -22,8 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ChatScreen extends StatefulWidget {
   final String name;
   final String callId;
-  final List<dynamic> friendList;
-  const ChatScreen({super.key, required this.friendList, required this.name, required this.callId});
+  const ChatScreen({super.key, required this.name, required this.callId});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -32,6 +31,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final String websocketUrl = "http://10.0.2.2:5001/";
   //final String websocketUrl = "http://localhost:5001/";
+  //final String websocketUrl = "http://192.168.17.160:5001/";
   //final String selfCallerId = math.Random().nextInt(999999).toString().padLeft(6, '0');
   
   dynamic incomingSDPOffer;
@@ -98,22 +98,22 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: secondary2,
-      appBar: AppBar(
-        backgroundColor: secondary2,
-        title: Text('${widget.name} ${widget.callId}', style: title,),
-        actions: [
-          IconButton(
-            icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
-            onPressed: () {
-              _joinCall(
-                callerId: selfCallerId,
-                calleeId: '232322323',
-              );
-            },
-          ),
-        ],
-      ),
+      backgroundColor: Colors.white,
+      // appBar: AppBar(
+      //   backgroundColor: secondary2,
+      //   title: Text('${widget.name} ${widget.callId}', style: title,),
+      //   actions: [
+      //     IconButton(
+      //       icon: const Iconify(Ph.video_camera_fill, color: Colors.white,), // widget,
+      //       onPressed: () {
+      //         _joinCall(
+      //           callerId: selfCallerId,
+      //           calleeId: '232322323',
+      //         );
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: Stack(
         children: [
           Column(
@@ -198,8 +198,6 @@ class _ChatScreenState extends State<ChatScreen> {
           
         ],
       ),
-      drawer: CustomDrawer(friendList: widget.friendList,),
-
     );
   }
 }

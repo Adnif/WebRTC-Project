@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ffi';
 import 'package:bcall/Screens/ChatScreen.dart';
 import 'package:bcall/Providers/UserProvider.dart';
+import 'package:bcall/Screens/HomeScreen.dart';
 import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/Style/text_style.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomDrawer extends StatefulWidget {
   List<dynamic> friendList;
-  CustomDrawer({super.key, required, required this.friendList});
+  Function(int) callback;
+  Function() refresh;
+  CustomDrawer({super.key, required, required this.friendList, required this.callback, required this.refresh});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -38,9 +40,13 @@ class _CustomDrawerState extends State<CustomDrawer>{
         msg: "Teman berhasil ditambah",
         toastLength: Toast.LENGTH_SHORT
       );
-      setState(() {
-        
-      });
+      widget.refresh();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        )
+      );
     } else if(response.statusCode == 404){
       Fluttertoast.showToast(
         msg: responseBody["message"]
@@ -53,11 +59,11 @@ class _CustomDrawerState extends State<CustomDrawer>{
   Widget build(BuildContext context) {
     //log(friendList.toString());
     return Container(
-      color: secondary,
+      color: white,
       width: 350, // Set the desired width here
       child: Row(
           children: [
-            SizedBox(
+            SizedBox(   
               width: 70,
               child: ListView(
                 children: [
@@ -66,7 +72,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                       horizontal: 8, vertical: 4
                     ),
                     child: CircleAvatar(
-                      backgroundColor: Colors.white,
+                      backgroundColor: primary,
                       radius: 30,
                     ),
                   ),
@@ -88,7 +94,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
               child: SafeArea(
                 child: Container(
                     decoration: BoxDecoration(
-                        color: secondary2,
+                        color: lightBlue,
                         borderRadius: BorderRadius.circular(16)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +116,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                     onPressed: (){
                                       showModalBottomSheet(
                                         isScrollControlled: true,
-                                        backgroundColor: secondary,
+                                        backgroundColor: lightGrey,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(20.0)
                                         ),
@@ -128,7 +134,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                                     Center(
                                                       child: Text(
                                                         'Invite a Friend',
-                                                        style: headline,
+                                                        style: headlineBlack,
                                                       ),
                                                     ),
                                                     const SizedBox(height: 10,),
@@ -165,7 +171,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                                           addFriend(phoneNumController.text);                                
                                                         },
                                                         style: ElevatedButton.styleFrom(
-                                                          backgroundColor:  primary,
+                                                          backgroundColor:  green,
                                                           disabledBackgroundColor: bodyc,
                                                           shape: RoundedRectangleBorder(
                                                             borderRadius: BorderRadius.circular(10.0)
@@ -201,7 +207,7 @@ class _CustomDrawerState extends State<CustomDrawer>{
                         ),
                         Expanded(
                           child: Material(
-                            color: secondary2,
+                            color: lightBlue,
                             child: ListView(
                               children: [
                                 Padding(
@@ -213,28 +219,29 @@ class _CustomDrawerState extends State<CustomDrawer>{
                                   child: Center(
                                     child: Text(
                                       'Private Messages',
-                                      style: subheader,
+                                      style: subheaderBlack,
                                     ),
                                   ),
                                 ),
                                 //...["Bambang Kuncoro", "A. Awalludin", "Buyung Ahmad Yani"]
-                                ...widget.friendList
-                                    .map((channel) => ListTile(
+                                ...widget.friendList.asMap()
+                                  .entries.map((entry) { 
+                                    final int index = entry.key;
+                                    final Map<String, dynamic> channel = entry.value;
+
+                                    return ListTile(
                                           leading: const CircleAvatar(
                                             backgroundColor: Colors.amber,
                                             radius: 20,
                                           ),
                                           horizontalTitleGap: 7,
-                                          title: Text(channel['username'], style: subheader,),
+                                          title: Text(channel['username'], style: subheaderBlack,),
                                           onTap: () {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ChatScreen(friendList: widget.friendList, name: channel['username'], callId: channel['_id'].substring(channel['_id'].length - 6),),
-                                              )
-                                            );
+                                            widget.callback(index);
+                                            Navigator.pop(context);
                                           },
-                                        )),                                
+                                    );                            
+                                  }),                                
                               ],
                             ),
                           ),

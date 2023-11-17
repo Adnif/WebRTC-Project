@@ -23,7 +23,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     return Scaffold(
-      backgroundColor: primary,
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [SliverFillRemaining(
           hasScrollBody: false,
@@ -40,7 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         : EdgeInsets.only(bottom: 59),
                     child: Text(
                       'LOGO',
-                      style: bold,
+                      style: boldGreen,
                     ),
                   ),
                 ),
@@ -50,7 +50,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   //color: secondary,
                   duration: Duration(seconds: 1),
                   decoration: BoxDecoration(
-                    color:secondary,
+                    color: lightBlue,
                     //border: Border.all(color: secondary, width: 5),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(25.0),
@@ -67,13 +67,13 @@ class _AuthScreenState extends State<AuthScreen> {
                           children: [
                             Text(
                               isLogin ? "Need an account?" : "Already have an account?",
-                              style: subheader,
+                              style: subheaderBlack,
                             ),
                             GestureDetector(
                               onTap: toggleSignUp,
                               child: Text(
                                 isLogin ? 'Create an account' : 'Login',
-                                style: subheader2,
+                                style: subheader2Black,
                               ),
                             )
                           ],

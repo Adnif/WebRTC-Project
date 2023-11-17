@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:bcall/Style/colors_style.dart';
 import 'package:bcall/services/SignallingService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -77,7 +78,18 @@ class _CallScreenState extends State<CallScreen> {
       'iceServers': [
         {
           'urls':[
-            'stun:stun.l.google.com:19302'
+            'stun:stun.l.google.com:19302',
+            'stun:numb.viagenie.ca:3478',
+            'stun:s1.taraba.net:3478',
+            'stun:s2.taraba.net:3478',
+            'stun:stun.12connect.com:3478',
+            'stun:stun.12voip.com:3478',
+            'stun:stun.1und1.de:3478',
+            'stun:stun.2talk.co.nz:3478',
+            'stun:stun.2talk.com:3478',
+            'stun:stun.3clogic.com:3478',
+            'stun:stun.3cx.com:3478',
+            'stun:stun.a-mm.tv:3478',
           ]
         },
         {
@@ -251,9 +263,10 @@ class _CallScreenState extends State<CallScreen> {
   Widget build(BuildContext context) {
     log('Ini Connection State: ${_rtcPeerConnection?.connectionState}');
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: white,
       appBar: AppBar(
         title: const Text("P2P Call App"),
+        backgroundColor: secondary2,
       ),
       body: SafeArea(
         child: Column(
